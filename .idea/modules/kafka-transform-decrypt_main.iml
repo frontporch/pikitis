@@ -11,6 +11,21 @@
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="Gradle: org.jetbrains.kotlin:kotlin-stdlib:1.0.3" level="project" />
+    <orderEntry type="library" name="Gradle: org.apache.kafka:kafka_2.10:0.8.2.1" level="project" />
     <orderEntry type="library" name="Gradle: org.jetbrains.kotlin:kotlin-runtime:1.0.3" level="project" />
+    <orderEntry type="library" name="Gradle: com.yammer.metrics:metrics-core:2.2.0" level="project" />
+    <orderEntry type="library" name="Gradle: org.scala-lang:scala-library:2.10.4" level="project" />
+    <orderEntry type="library" name="Gradle: org.apache.kafka:kafka-clients:0.8.2.1" level="project" />
+    <orderEntry type="library" name="Gradle: org.apache.zookeeper:zookeeper:3.4.6" level="project" />
+    <orderEntry type="library" name="Gradle: net.sf.jopt-simple:jopt-simple:3.2" level="project" />
+    <orderEntry type="library" name="Gradle: com.101tec:zkclient:0.3" level="project" />
+    <orderEntry type="library" name="Gradle: net.jpountz.lz4:lz4:1.2.0" level="project" />
+    <orderEntry type="library" name="Gradle: org.xerial.snappy:snappy-java:1.1.1.6" level="project" />
+    <orderEntry type="library" name="Gradle: org.slf4j:slf4j-log4j12:1.6.1" level="project" />
+    <orderEntry type="library" name="Gradle: log4j:log4j:1.2.16" level="project" />
+    <orderEntry type="library" name="Gradle: jline:jline:0.9.94" level="project" />
+    <orderEntry type="library" name="Gradle: io.netty:netty:3.7.0.Final" level="project" />
+    <orderEntry type="library" name="Gradle: org.slf4j:slf4j-api:1.7.6" level="project" />
+    <orderEntry type="library" name="Gradle: junit:junit:3.8.1" level="project" />
   </component>
 </module>
