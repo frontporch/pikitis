@@ -27,5 +27,6 @@ dependencies {
     compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
 
     // kafka
-    compile 'org.apache.kafka:kafka_2.10:0.8.2.1'
+    //compile 'org.apache.kafka:kafka-clients:0.10.0.1'
+    compile 'org.apache.kafka:kafka-clients:0.9.0.1'
 }
