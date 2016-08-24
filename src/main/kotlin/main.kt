@@ -4,6 +4,7 @@ import org.apache.kafka.clients.producer.Producer
 import org.apache.kafka.clients.producer.ProducerConfig
 import org.apache.kafka.clients.producer.ProducerRecord
 import org.apache.kafka.common.errors.WakeupException
+import org.msgpack.core.MessagePack
 import java.io.File
 import java.util.*
 import java.util.concurrent.atomic.AtomicBoolean
