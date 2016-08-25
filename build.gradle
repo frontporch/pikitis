@@ -25,6 +25,8 @@ repositories {
 
 dependencies {
     compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+    testCompile 'junit:junit:4.11'
+    testCompile "org.jetbrains.kotlin:kotlin-test-junit:$kotlin_version"
 
     // kafka
     //compile 'org.apache.kafka:kafka-clients:0.10.0.1'

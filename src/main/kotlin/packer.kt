@@ -9,7 +9,7 @@ class Packer(val transform: (buffer: ByteArray, len: Int) -> String) {
     private var buffer: ByteArray = ByteArray(256)
     private val unpacker = MessagePack.newDefaultUnpacker(buffer)
     private val packer = MessagePack.newDefaultBufferPacker()
-    private val output = ArrayBufferOutput(256)
+    private val output = ArrayBufferOutput() // TODO a subclass is probably needed to get more array reuse
 
     /**
      * Creates new msgpack array from `packed`
@@ -30,7 +30,7 @@ class Packer(val transform: (buffer: ByteArray, len: Int) -> String) {
         val unpacker = unpacker
         val packer = packer
         unpacker.reset(ArrayBufferInput(packed))
-        packer.reset(output) // TODO make sure we're not shrinking
+        packer.reset(output)
 
 
         // array length
@@ -53,9 +53,11 @@ class Packer(val transform: (buffer: ByteArray, len: Int) -> String) {
 
         // (cheat and) copy the rest verbatim
         val remaining = packed.size - unpacker.totalReadBytes
-        packer.writePayload(packed, unpacker.totalReadBytes as Int, remaining as Int)
+        packer.writePayload(packed, unpacker.totalReadBytes.toInt(), remaining.toInt())
 
-        return packer.toByteArray()
+        val bytes = packer.toByteArray()
+        output.clear() // see `output` sad panda above
+        return bytes
     }
 
     private fun getBuffer(len: Int): ByteArray {
