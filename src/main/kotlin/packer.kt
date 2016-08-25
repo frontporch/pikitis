@@ -56,7 +56,7 @@ class Packer(val transform: (buffer: ByteArray, len: Int) -> String) {
         packer.writePayload(packed, unpacker.totalReadBytes.toInt(), remaining.toInt())
 
         val bytes = packer.toByteArray()
-        output.clear() // see `output` sad panda above
+        output.clear() // see `output` sad panda on property declaration
         return bytes
     }
 
