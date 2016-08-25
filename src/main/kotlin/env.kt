@@ -3,8 +3,8 @@ import java.util.*
 
 enum class DecryptionType {
     ADX,
-    BLOWFISH,
     OPENX,
+    RUBICON,
 }
 
 data class Env(
@@ -45,7 +45,7 @@ data class Env(
             val type = get("DECRYPTION_TYPE") {
                 when (it.toLowerCase()) {
                     "adx" -> DecryptionType.ADX
-                    "blowfish" -> DecryptionType.BLOWFISH
+                    "blowfish" -> DecryptionType.RUBICON
                     "openx" -> DecryptionType.OPENX
                     else -> throw Exception("Expected one of: ${DecryptionType.values().joinToString()}")
                 }

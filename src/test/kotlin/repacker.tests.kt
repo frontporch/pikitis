@@ -90,9 +90,9 @@ private fun values(buffer: ByteArray): MutableList<Any?> {
 }
 
 
-class PackerTest {
+class RepackerTest {
     @Test fun shouldWorkMultipleTimes() {
-        val packer = Packer(::bytesToHex)
+        val packer = Repacker(::bytesToHex)
         val msg = build {
             integer(1)
             binary(byteArrayOf(1, 2, 3))
@@ -106,7 +106,7 @@ class PackerTest {
     }
 
     @Test fun shouldHandleAssortedTypesAndLengths() {
-        val packer = Packer(::bytesToHex)
+        val packer = Repacker(::bytesToHex)
         test(packer, build {
             integer(1)
             binary(byteArrayOf(42))
@@ -128,11 +128,11 @@ class PackerTest {
         })
     }
 
-    private fun test(packer: Packer, msg: MessageBuilder) {
+    private fun test(repacker: Repacker, msg: MessageBuilder) {
         val expected = msg.values().toMutableList()
         expected[2] = bytesToHex(expected[1] as ByteArray)
         val beforeBytes = msg.toByteArray()
-        val afterBytes = packer.repack(beforeBytes)
+        val afterBytes = repacker.repack(beforeBytes)
         val actual = values(afterBytes)
 
         hexify(expected, actual)

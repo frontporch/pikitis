@@ -6,7 +6,7 @@ import org.msgpack.core.buffer.ArrayBufferOutput
 /**
  * NOT THREAD SAFE
  */
-class Packer(val transform: (buffer: ByteArray, len: Int) -> String) {
+class Repacker(val transform: (buffer: ByteArray, len: Int) -> String) {
     private var buffer = ByteArray(256)
     private val unpacker = MessagePack.newDefaultUnpacker(buffer)
     private val packer = MessagePack.newDefaultBufferPacker()

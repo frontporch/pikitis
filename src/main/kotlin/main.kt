@@ -45,10 +45,10 @@ fun main(args: Array<String>) {
 
     val decryptinator = when (env.type) {
         DecryptionType.ADX -> TODO()
-        DecryptionType.BLOWFISH -> Blowfish(env.decryptionKey)
+        DecryptionType.RUBICON -> Rubicon(env.decryptionKey)
         DecryptionType.OPENX -> TODO()
     }
-    val repacker = Packer({ bytes, len -> decryptinator.decrypt(bytes, len) })
+    val repacker = Repacker({ bytes, len -> decryptinator.decrypt(bytes, len) })
 
     // TODO move kafka init to helper function
     val deserializer = "org.apache.kafka.common.serialization.ByteArrayDeserializer"
