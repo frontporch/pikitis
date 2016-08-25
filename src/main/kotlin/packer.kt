@@ -2,11 +2,12 @@ import org.msgpack.core.MessagePack
 import org.msgpack.core.buffer.ArrayBufferInput
 import org.msgpack.core.buffer.ArrayBufferOutput
 
+// FIXME rename to Repacker (same for file, tests, etc)
 /**
  * NOT THREAD SAFE
  */
 class Packer(val transform: (buffer: ByteArray, len: Int) -> String) {
-    private var buffer: ByteArray = ByteArray(256)
+    private var buffer = ByteArray(256)
     private val unpacker = MessagePack.newDefaultUnpacker(buffer)
     private val packer = MessagePack.newDefaultBufferPacker()
     private val output = ArrayBufferOutput() // TODO a subclass is probably needed to get more array reuse

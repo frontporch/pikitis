@@ -1,12 +1,14 @@
-import org.apache.kafka.clients.consumer.*
+import org.apache.kafka.clients.consumer.Consumer
+import org.apache.kafka.clients.consumer.ConsumerConfig
+import org.apache.kafka.clients.consumer.ConsumerRecord
+import org.apache.kafka.clients.consumer.KafkaConsumer
 import org.apache.kafka.clients.producer.KafkaProducer
 import org.apache.kafka.clients.producer.Producer
 import org.apache.kafka.clients.producer.ProducerConfig
 import org.apache.kafka.clients.producer.ProducerRecord
-import org.apache.kafka.common.errors.WakeupException
-import java.util.concurrent.atomic.AtomicBoolean
 
-fun <T> loop(
+// inline the main loop because we can
+inline fun <T> loop(
         topic: String,
         consumer: Consumer<T, T>,
         producer: Producer<T, T>,
@@ -41,7 +43,15 @@ fun main(args: Array<String>) {
     }
     println(env)
 
-    val deserializer = "org.apache.kafka.common.serialization.StringDeserializer"
+    val decryptinator = when (env.type) {
+        DecryptionType.ADX -> TODO()
+        DecryptionType.BLOWFISH -> Blowfish(env.decryptionKey)
+        DecryptionType.OPENX -> TODO()
+    }
+    val repacker = Packer({ bytes, len -> decryptinator.decrypt(bytes, len) })
+
+    // TODO move kafka init to helper function
+    val deserializer = "org.apache.kafka.common.serialization.ByteArrayDeserializer"
     val consumerConfig = mapOf(
             ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG to env.kafkaBrokers,
             ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG to false,
@@ -50,7 +60,7 @@ fun main(args: Array<String>) {
             ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG to deserializer // pretty sure we're not using keys at all
     )
 
-    val serializer = "org.apache.kafka.common.serialization.StringSerializer"
+    val serializer = "org.apache.kafka.common.serialization.ByteArraySerializer"
     val producerConfig = mapOf(
             ProducerConfig.BOOTSTRAP_SERVERS_CONFIG to env.kafkaBrokers,
             ProducerConfig.ACKS_CONFIG to "1", // we could switch to "all" for paranoia
@@ -60,36 +70,20 @@ fun main(args: Array<String>) {
     )
 
 
-
-    // TODO switch to bytes
-    val kc = KafkaConsumer<String, String>(consumerConfig)
+    val kc = KafkaConsumer<ByteArray, ByteArray>(consumerConfig)
     kc.subscribe(env.incomingTopics.toMutableList())
-    val closed = AtomicBoolean(false)
-    Runtime.getRuntime().addShutdownHook(Thread {
-        println("this is the shutdown stuff")
-        closed.set(true)
-        kc.wakeup()
-    })
 
-    val kp = KafkaProducer<String, String>(producerConfig)
+    val kp = KafkaProducer<ByteArray, ByteArray>(producerConfig)
     try {
-        fun poison(record: ConsumerRecord<String, String>, exception: Exception) {
+        fun poison(record: ConsumerRecord<ByteArray, ByteArray>, exception: Exception) {
             // FIXME send to poison topic
             System.err.println(record)
             System.err.println(exception)
         }
 
-        loop(env.outgoingTopic, kc, kp, ::poison) {
-            // TODO
-            // - deserialize
-            // - decrypt
-            it
-        }
-    } catch (e: WakeupException) {
-        if (!closed.get()) throw e
+        loop(env.outgoingTopic, kc, kp, ::poison) { msg -> repacker.repack(msg) }
     } finally {
         kc.close()
         kp.close()
-        println("see ya")
     }
 }
