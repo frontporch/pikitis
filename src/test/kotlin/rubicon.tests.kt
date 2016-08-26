@@ -27,13 +27,13 @@ class RubiconTests {
 
     @Test fun decrypt() {
         val r = Rubicon(key)
-        val expected = "0.238298"
         val inputs = listOf(
                 "9CE9A1B1AB9902E2",
                 "0x9CE9A1B1AB9902E2",
                 "0x9ce9a1b1ab9902e2")
 
         for (input in inputs) {
+            val expected = "0.238298"
             val bytes = encode(input)
             val actual = r.decrypt(bytes, bytes.size)
             assertEquals(expected, actual)

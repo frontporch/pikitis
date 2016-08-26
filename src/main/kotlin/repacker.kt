@@ -2,15 +2,17 @@ import org.msgpack.core.MessagePack
 import org.msgpack.core.buffer.ArrayBufferInput
 import org.msgpack.core.buffer.ArrayBufferOutput
 
-// FIXME rename to Repacker (same for file, tests, etc)
+// TODO a subclass is probably needed to get more array reuse
+fun getArrayBufferOutput() = ArrayBufferOutput()
+
 /**
  * NOT THREAD SAFE
  */
-class Repacker(val transform: (buffer: ByteArray, len: Int) -> String) {
+class Repacker(val transform: Decryptinator) {
     private var buffer = ByteArray(256)
     private val unpacker = MessagePack.newDefaultUnpacker(buffer)
     private val packer = MessagePack.newDefaultBufferPacker()
-    private val output = ArrayBufferOutput() // TODO a subclass is probably needed to get more array reuse
+    private val output = getArrayBufferOutput()
 
     /**
      * Creates new msgpack array from `packed`
@@ -45,19 +47,20 @@ class Repacker(val transform: (buffer: ByteArray, len: Int) -> String) {
         val buffer = getBuffer(len)
         unpacker.readPayload(buffer, 0, len)
         packer.packBinaryHeader(len)
-        packer.writePayload(buffer, 0, len)
+        packer.writePayload(buffer, 0, len) // copy bytes
 
         // index 2 transform result
-        val result = transform(buffer, len)
-        packer.packString(result)
         unpacker.unpackNil()
+        // buffer has been copied to index, now ok to modify
+        val transformed = transform.decrypt(buffer, len)
+        packer.packString(transformed)
 
-        // (cheat and) copy the rest verbatim
+        // (cheat and) use the rest verbatim
         val remaining = packed.size - unpacker.totalReadBytes
-        packer.writePayload(packed, unpacker.totalReadBytes.toInt(), remaining.toInt())
+        packer.addPayload(packed, unpacker.totalReadBytes.toInt(), remaining.toInt()) // refer to bytes
 
         val bytes = packer.toByteArray()
-        output.clear() // see `output` sad panda on property declaration
+        output.clear() // see `getArrayBufferOutput` sad panda above
         return bytes
     }
 

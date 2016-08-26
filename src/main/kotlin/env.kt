@@ -10,11 +10,12 @@ enum class DecryptionType {
 data class Env(
         val type: DecryptionType,
         val kafkaBrokers: String,
-        val incomingTopics: Collection<String>,
-        val outgoingTopic: String,
+        // incoming topic -> outoing topic
+        val topics: Map<String, String>,
+        // poison topic
+        val poison: String,
         val decryptionKey: String,
-        val verificationKey: String?,
-        val inTopicValues: Collection<String>?) {
+        val integrityKey: String?) {
 
     companion object {
         fun parse(variables: Map<String, String>): EnvResult {
@@ -43,34 +44,37 @@ data class Env(
 
 
             val type = get("DECRYPTION_TYPE") {
-                when (it.toLowerCase()) {
-                    "adx" -> DecryptionType.ADX
-                    "blowfish" -> DecryptionType.RUBICON
-                    "openx" -> DecryptionType.OPENX
-                    else -> throw Exception("Expected one of: ${DecryptionType.values().joinToString()}")
+                try {
+                    DecryptionType.valueOf(it.toUpperCase())
+                } catch (e: IllegalArgumentException) {
+                    throw Exception("Expected one of: ${DecryptionType.values().joinToString()}")
                 }
             }
 
-            var inTopicValues: Collection<String>? = null;
-            val topicsIn = get("TOPIC_IN") { topic ->
-                val values = variables["TOPIC_IN_VALUES"]
-                if (values.isNullOrBlank()) {
-                    listOf(topic)
-                }
-                else {
-                    if (!topic.contains('$'))
-                        throw Exception("TOPIC_IN_VALUES was provided, expected '$topic' to contain '$'")
+            // require "one to one" or "all to one"; anything else is ambiguous
+            val whitespace = Regex("\\s+")
+            val inTopics = get("TOPIC_IN") { it.trim().split(whitespace) }
+            val outTopics = get("TOPIC_OUT") {
+                val topics = it.trim().split(whitespace)
+                if (topics.size != 1 && topics.size != inTopics?.size)
+                    throw Exception("Expected exactly one TOPIC_OUT or one for each TOPIC_IN")
 
-                    inTopicValues = values!!.split(",").map { it.trim() }
-                    inTopicValues!!.map { topic.replace("$", it) }
-                }
+                topics
             }
+            val topicMap = if (inTopics != null && outTopics != null) {
+                val many = outTopics.size > 1
+                inTopics.withIndex().associate { Pair(it.value, outTopics[if (many) it.index else 0]) }
+            } else {
+                null
+            }
+
+            fun DecryptionType?.integrity() = this == DecryptionType.OPENX || this == DecryptionType.ADX
 
             // validation?
+            val poison = get("TOPIC_POISON")
             val brokers = get("KAFKA_BROKERS")
-            val topicOut = get("TOPIC_OUT")
             val decryptionKey = get("DECRYPTION_KEY", then = ::readAllText)
-            val verificationKey = get("VERIFICATION_KEY", required = false, then = ::readAllText)
+            val integrityKey = get("INTEGRITY_KEY", then = ::readAllText, required = type.integrity())
 
             if (errors.any())
                 return EnvResult(null, errors)
@@ -78,11 +82,10 @@ data class Env(
             return EnvResult(Env(
                     type!!,
                     brokers!!,
-                    topicsIn!!,
-                    topicOut!!,
+                    topicMap!!,
+                    poison!!,
                     decryptionKey!!,
-                    verificationKey,
-                    inTopicValues))
+                    integrityKey))
         }
     }
 }

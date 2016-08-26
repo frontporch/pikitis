@@ -24,7 +24,7 @@ private fun bytesToHex(buffer: ByteArray, len: Int): String {
     return result.toString()
 }
 
-private fun Value.toAny(): Any? = when (this.valueType) {
+private fun Value.toAny(): Any? = when (this.valueType!!) {
     ValueType.NIL -> null
     ValueType.BOOLEAN -> this.asBooleanValue().boolean
     ValueType.INTEGER -> this.asIntegerValue().toLong()
@@ -89,10 +89,14 @@ private fun values(buffer: ByteArray): MutableList<Any?> {
     return items
 }
 
+private object ByteToHexInator : Decryptinator {
+    override fun decrypt(bytes: ByteArray, len: Int) = bytesToHex(bytes, len)
+}
+
 
 class RepackerTest {
     @Test fun shouldWorkMultipleTimes() {
-        val packer = Repacker(::bytesToHex)
+        val packer = Repacker(ByteToHexInator)
         val msg = build {
             integer(1)
             binary(byteArrayOf(1, 2, 3))
@@ -106,7 +110,7 @@ class RepackerTest {
     }
 
     @Test fun shouldHandleAssortedTypesAndLengths() {
-        val packer = Repacker(::bytesToHex)
+        val packer = Repacker(ByteToHexInator)
         test(packer, build {
             integer(1)
             binary(byteArrayOf(42))

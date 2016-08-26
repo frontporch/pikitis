@@ -1,5 +1,8 @@
 group 'com.frontporch.rtb.kafkatransformdecrypt'
-version '1.0-SNAPSHOT'
+ext.originUrl = 'git config --get remote.origin.url'.execute().text.trim()
+ext.tag = 'git describe --abbrev=0 --tags'.execute().text.trim()
+ext.hash = 'git rev-parse --short HEAD'.execute().text.trim()
+version = "${tag}-${hash}"
 
 buildscript {
     ext.kotlin_version = '1.0.3'
@@ -23,6 +26,13 @@ repositories {
     mavenCentral()
 }
 
+jar {
+    manifest {
+        attributes 'git-version': "${version}"
+        attributes 'git-origin': "${originUrl}"
+    }
+}
+
 dependencies {
     compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
     testCompile 'junit:junit:4.11'
@@ -37,4 +47,14 @@ dependencies {
 
     // openx needs this
     compile "commons-codec:commons-codec:1.10"
+
+    // adx is this
+    compile "com.google.doubleclick:doubleclick-core:1.0.7"
+
+    // slf4j
+    compile "org.slf4j:slf4j-api:1.7.+"
+    compile "ch.qos.logback:logback-classic:1.1.7"
+
+    // read the manifest for me, I'm tired
+    compile "com.jcabi:jcabi-manifests:1.1"
 }

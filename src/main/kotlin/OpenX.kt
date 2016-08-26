@@ -1,19 +1,21 @@
 import org.openx.market.ssrtb.crypter.SsRtbCrypter
 
 class OpenX(encryptKey: String, integrityKey: String) : Decryptinator {
-    private val crypter = SsRtbCrypter()
-    private val encryptKey = crypter.hexStrToKey(encryptKey)
-    private val integrityKey = crypter.hexStrToKey(integrityKey)
+    private val crypto = SsRtbCrypter()
+    private val encryptKey = crypto.hexStrToKey(encryptKey)
+    private val integrityKey = crypto.hexStrToKey(integrityKey)
 
     override fun decrypt(bytes: ByteArray, len: Int): String {
-        // slow but probably correct version
         // could be faster:
-        // - decrypt the bytes directly
-        // - base64 decode websafe directly from byte array
-        // - reuse HMAC_SHA1 instance
-        // - turn byte array of 'long micros' directly to currency string
-        val micros = crypter.decodeDecrypt(bytes.toString(Charsets.US_ASCII), encryptKey, integrityKey)
-        val currency = micros.toDouble() / 1000000.0
-        return currency.toString()
+        // - base64 url decode directly from byte array
+        // - reuse arrays in `decrypt`
+        // - reuse HMAC_SHA1 instances in `decrypt`
+        // - after decryption turn byte array segment directly to long
+        //
+        // hopefully the crypto overhead dwarfs any of these potential optimizations anyway
+
+        val s = String(bytes, 0, len, Charsets.US_ASCII)
+        val micros = crypto.decodeDecrypt(s, encryptKey, integrityKey)
+        return microsToCurrency(micros)
     }
 }
