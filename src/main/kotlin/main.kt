@@ -46,7 +46,7 @@ fun main(args: Array<String>) {
     val decryptinator = when (env.type) {
         DecryptionType.ADX -> TODO()
         DecryptionType.RUBICON -> Rubicon(env.decryptionKey)
-        DecryptionType.OPENX -> TODO()
+        DecryptionType.OPENX -> OpenX(env.decryptionKey, env.verificationKey!!)
     }
     val repacker = Repacker({ bytes, len -> decryptinator.decrypt(bytes, len) })
 

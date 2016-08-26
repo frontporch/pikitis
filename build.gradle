@@ -34,4 +34,7 @@ dependencies {
 
     // msgpack
     compile 'org.msgpack:msgpack-core:0.8.9'
+
+    // openx needs this
+    compile "commons-codec:commons-codec:1.10"
 }
