@@ -1,5 +1,5 @@
 FROM openjdk:8-jre
-ENV RELEASE=https://github.com/frontporch/pikitis/releases/download/v1.1/kafka-transform-decrypt-v1.1-2c8d9b7.tar
+ENV RELEASE=https://github.com/frontporch/pikitis/releases/download/v1.2/kafka-transform-decrypt-v1.2.tar
 ENV OUTPUT_DIR=/opt/pikitis
 
 # see README.md for other environment variables
