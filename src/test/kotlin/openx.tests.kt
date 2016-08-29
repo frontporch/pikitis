@@ -68,4 +68,18 @@ class OpenxTests {
             assertEquals(expected, d.decrypt(bytes.copyOf(bytes.size + 3), bytes.size))
         }
     }
+
+    @Test
+    fun cli() {
+        val manuallyGenerated = mapOf(
+                "AAABVtgXmVgdLG5nomNioArXGjuQPFOAvsBI6A" to 3.14159,
+                "AAABVtgWarfZjLbrcJP-_3dNvOY3inayWr__uA" to 2.7182
+        )
+
+        val acmeCrypto = Adx(DecryptionType.OPENX.sampleEncryptionKey, DecryptionType.OPENX.sampleIntegrityKey!!)
+        for ((crypted, expected) in manuallyGenerated) {
+            val actual = acmeCrypto.decrypt(crypted.toByteArray(), crypted.length)
+            assertEquals(expected.toString(), actual)
+        }
+    }
 }

@@ -34,4 +34,18 @@ class AdxTests {
             assertEquals(expected, acmeCrypto.decrypt(encoded.copyOf(encoded.size + 3), encoded.size))
         }
     }
+
+    @Test
+    fun cli() {
+        val manuallyGenerated = mapOf(
+            "AAHuflKUDszbOcs7F_uxiv627umrQ5eUKwfwSw==" to 3.14159,
+            "AAHulRV2_MbKKluhg0FQXM0iyVTBydqqCL5_cQ==" to 2.7182
+        )
+
+        val acmeCrypto = Adx(DecryptionType.ADX.sampleEncryptionKey, DecryptionType.ADX.sampleIntegrityKey!!)
+        for ((crypted, expected) in manuallyGenerated) {
+            val actual = acmeCrypto.decrypt(crypted.toByteArray(), crypted.length)
+            assertEquals(expected.toString(), actual)
+        }
+    }
 }

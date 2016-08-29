@@ -97,4 +97,10 @@ object Main {
     }
 }
 
-fun main(args: Array<String>) = Main.main()
+fun main(args: Array<String>) {
+    if (Encryptinator.shouldEncryptinate(args)) {
+        Encryptinator.main(args)
+    } else {
+        Main.main()
+    }
+}

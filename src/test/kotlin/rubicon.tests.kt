@@ -34,7 +34,7 @@ class RubiconTests {
 
         for (input in inputs) {
             val expected = "0.238298"
-            val bytes = encode(input)
+            val bytes = input.toByteArray()
             val actual = r.decrypt(bytes, bytes.size)
             assertEquals(expected, actual)
         }
@@ -45,16 +45,9 @@ class RubiconTests {
             "26B2401D9967E4AC" to "0.197758")
 
         for ((input, expected) in examples) {
-            val bytes = encode(input)
+            val bytes = input.toByteArray()
             val actual = r.decrypt(bytes, bytes.size)
             assertEquals(expected, actual)
         }
-    }
-
-    private fun encode(s: String): ByteArray {
-        var buffer = Charsets.US_ASCII.encode(s)
-        var bytes = ByteArray(buffer.remaining())
-        buffer.get(bytes)
-        return bytes
     }
 }
