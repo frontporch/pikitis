@@ -132,6 +132,39 @@ class RepackerTest {
         })
     }
 
+    @Test fun shouldTolerateEmptyStringAtDestination() {
+        val packer = Repacker(ByteToHexInator)
+        test(packer, build {
+            integer(1)
+            binary(byteArrayOf(0x3, 0x14, 0x15))
+            string("")
+        })
+
+        test(packer, build {
+            integer(1)
+            binary(byteArrayOf(3, 14, 15, 92, 65))
+            string("")
+            nil()
+        })
+
+        test(packer, build {
+            integer(1)
+            binary(byteArrayOf(3, 14, 15, 92, 65))
+            string("")
+            string("pi")
+        })
+
+        test(packer, build {
+            integer(1)
+            binary(byteArrayOf(3, 14, 15, 92, 65))
+            string("")
+            string("pi")
+            nil()
+            string("yum")
+        })
+
+    }
+
     private fun test(repacker: Repacker, msg: MessageBuilder) {
         val expected = msg.values().toMutableList()
         expected[2] = bytesToHex(expected[1] as ByteArray)
