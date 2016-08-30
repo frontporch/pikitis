@@ -17,7 +17,7 @@ RUN cd /tmp && \
     tar -xvf release.tar -C ${OUTPUT_DIR} && \
 
     # Move the release folder contents up
-    mv ${OUTPUT_DIR}/kafka-transform-decrypt-*/* ${OUTPUT_DIR}
+    mv ${OUTPUT_DIR}/kafka-transform-decrypt-*/* ${OUTPUT_DIR} && \
 
     # Clean up after ourselves
     rm -fr /tmp/*
