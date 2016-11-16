@@ -63,7 +63,8 @@ data class Env(
         // poison topic
         val poison: String,
         val decryptionKey: String,
-        val integrityKey: String?) {
+        val integrityKey: String?,
+        val httpPort: Int?) {
 
     companion object {
         fun parse(variables: Map<String, String>): EnvResult {
@@ -121,6 +122,7 @@ data class Env(
             val brokers = get("KAFKA_BROKERS")
             val decryptionKey = get("DECRYPTION_KEY", then = ::readAllText)
             val integrityKey = get("INTEGRITY_KEY", then = ::readAllText, required = type?.sampleIntegrityKey != null)
+            val httpPort = get(name = "HTTP_PORT", required = false, then = String::toInt)
 
             if (errors.any())
                 return EnvResult(null, errors)
@@ -131,7 +133,8 @@ data class Env(
                     topicMap!!,
                     poison!!,
                     decryptionKey!!,
-                    integrityKey))
+                    integrityKey,
+                    httpPort))
         }
     }
 }

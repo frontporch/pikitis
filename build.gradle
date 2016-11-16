@@ -5,7 +5,7 @@ ext.hash = 'git rev-parse --short HEAD'.execute().text.trim()
 version = "${tag}-${hash}"
 
 buildscript {
-    ext.kotlin_version = '1.0.3'
+    ext.kotlin_version = '1.0.5'
 
     repositories {
         mavenCentral()
@@ -57,4 +57,14 @@ dependencies {
 
     // read the manifest for me, I'm tired
     compile "com.jcabi:jcabi-manifests:1.1"
+
+    // prometheus
+    compile "io.prometheus:simpleclient:0.0.18"
+    compile "io.prometheus:simpleclient_vertx:0.0.18"
+    // Hotspot JVM metrics
+    compile "io.prometheus:simpleclient_hotspot:0.0.18"
+
+    // vert.x
+    compile "io.vertx:vertx-core:3.3.3"
+    compile 'io.vertx:vertx-web:3.3.3'
 }
