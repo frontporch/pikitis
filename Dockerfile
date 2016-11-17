@@ -15,7 +15,7 @@ RUN cd ${BUILD_FOLDER} && \
     ./gradlew assembleDist && \
 
     # unpack tar file
-    ./prepare-dist-tar && \
+    chmod +x ./prepare-dist-tar && ./prepare-dist-tar && \
 
     # Create working dir
     mkdir -p ${OUTPUT_DIR} && \
