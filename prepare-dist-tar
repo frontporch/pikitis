@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+
+DIST_BUILDS=./build/distributions/
+TAR_BUILD=$(ls $DIST_BUILDS 2>/dev/null | grep .tar)
+BUILD_PATH=$DIST_BUILDS$TAR_BUILD
+BUILD_FOLDER="${DIST_BUILDS}pikitis"
+
+echo "Extracing tar '${BUILD_PATH}'"
+tar -xvf $BUILD_PATH -C $DIST_BUILDS >/dev/null
+# renamed to a stable name for the Dockerfile
+echo "Renaming extracted folder to '${BUILD_FOLDER}'"
+mv $(ls -d $DIST_BUILDS*/) $BUILD_FOLDER

@@ -1,26 +1,30 @@
-FROM openjdk:8-jre
-ENV RELEASE=https://github.com/frontporch/pikitis/releases/download/v1.4/kafka-transform-decrypt-v1.4.tar
+FROM openjdk:8-jdk
 ENV OUTPUT_DIR=/opt/pikitis
+ENV BUILD_FOLDER=/user/share/pikitis-build
 
 # see README.md for other environment variables
 ENV KAFKA_BROKERS="192.168.33.11:9092"
 
-RUN cd /tmp && \
+COPY . ${BUILD_FOLDER}
 
-    # Get the release
-    curl -L -o release.tar ${RELEASE} && \
+RUN cd ${BUILD_FOLDER} && \
+    # install git, needed for our gradle build
+    apt-get update > /dev/null && apt-get install -qq git && \
+
+    # build with gradle
+    ./gradlew assembleDist && \
+
+    # unpack tar file
+    ./prepare-dist-tar && \
 
     # Create working dir
     mkdir -p ${OUTPUT_DIR} && \
 
-    # Extract file
-    tar -xvf release.tar -C ${OUTPUT_DIR} && \
-
     # Move the release folder contents up
-    mv ${OUTPUT_DIR}/kafka-transform-decrypt-*/* ${OUTPUT_DIR} && \
+    mv ./build/distributions/pikitis/* ${OUTPUT_DIR} && \
 
     # Clean up after ourselves
-    rm -fr /tmp/*
+    apt-get clean && rm -fr /tmp/*
 
 WORKDIR ${OUTPUT_DIR}
 
