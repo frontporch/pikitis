@@ -1,6 +1,6 @@
 FROM openjdk:8-jdk
 ENV OUTPUT_DIR=/opt/pikitis
-ENV BUILD_FOLDER=/user/share/pikitis-build
+ENV BUILD_FOLDER=/tmp/pikitis-build
 
 # see README.md for other environment variables
 ENV KAFKA_BROKERS="192.168.33.11:9092"
@@ -22,6 +22,9 @@ RUN cd ${BUILD_FOLDER} && \
 
     # Move the release folder contents up
     mv ./build/distributions/pikitis/* ${OUTPUT_DIR} && \
+
+    # Change to pikitis directory
+    cd ${OUTPUT_DIR} && \
 
     # Clean up after ourselves
     apt-get clean && rm -fr /tmp/*
